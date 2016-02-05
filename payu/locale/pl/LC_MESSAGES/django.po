@@ -1,0 +1,115 @@
+# django-payu-payments.
+# Copyright (C) 2016 Michał Werner
+# This file is distributed under the same license as the PACKAGE package.
+
+msgid ""
+msgstr ""
+"Project-Id-Version: django-payu-payments\n"
+"POT-Creation-Date: 2016-02-05 11:10+0100\n"
+"PO-Revision-Date: 2016-02-05 11:12+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Translated-Using: django-rosetta 0.7.8\n"
+
+#: admin.py:27
+msgid "Status"
+msgstr "Status"
+
+#: admin.py:34
+msgid "Product"
+msgstr "Produkt"
+
+#: admin.py:34
+msgid "Unit price"
+msgstr "Cena jednostkowa"
+
+#: admin.py:34
+msgid "Quantity"
+msgstr "Ilość"
+
+#: admin.py:41
+msgid "Invalid data."
+msgstr "Nieprawidłowe dane."
+
+#: admin.py:42
+msgid "Products"
+msgstr "Produkty"
+
+#: admin.py:46
+msgid "Total"
+msgstr "Suma"
+
+#: apps.py:7
+msgid "PayU"
+msgstr "PayU"
+
+#: models.py:20
+msgid "New"
+msgstr "Nowa"
+
+#: models.py:21
+msgid "Pending"
+msgstr "Oczekująca"
+
+#: models.py:22
+msgid "Waiting for confirmation"
+msgstr "Oczekująca na potwierdzenie"
+
+#: models.py:23
+msgid "Completed"
+msgstr "Zakończona"
+
+#: models.py:24
+msgid "Canceled"
+msgstr "Anulowana"
+
+#: models.py:25
+msgid "Rejected"
+msgstr "Odrzucona"
+
+#: models.py:31
+msgid "PayU order ID"
+msgstr "Identyfikator zamówienia PayU"
+
+#: models.py:32
+msgid "PayU POS ID"
+msgstr "PayU POS ID"
+
+#: models.py:33
+msgid "customer IP"
+msgstr "IP klienta"
+
+#: models.py:34
+msgid "creation date"
+msgstr "data utworzenia"
+
+#: models.py:35
+msgid "status"
+msgstr "status"
+
+#: models.py:36
+msgid "total"
+msgstr "suma"
+
+#: models.py:37
+msgid "description"
+msgstr "opis"
+
+#: models.py:38
+msgid "products"
+msgstr "produkty"
+
+#: models.py:39
+msgid "notes"
+msgstr "notatki"
+
+#: models.py:43
+msgid "payment"
+msgstr "płatność"
+
+#: models.py:44
+msgid "payments"
+msgstr "płatności"

@@ -52,7 +52,7 @@ Usage
 
 To create payment object you have to call ``Payment.create`` method: ::
 
-    from payu import Payment
+    from payu.models import Payment
 
 
     description = 'Some stuff'

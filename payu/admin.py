@@ -34,10 +34,11 @@ class PaymentAdmin(admin.ModelAdmin):
         try:
             if not products:
                 return ''
-            output = format_html('<table><tr><td><strong>{}</strong></td><td><strong>{}</strong></td><td><strong>{}</strong></td></tr>', _('Product'), _('Unit price'), _('Quantity'))
+            output = format_html('<table><tr><td><strong>{}</strong></td><td><strong>{}</strong></td><td><strong>{}</strong></td><td><strong>{}</strong></td></tr>', _('Product'), _('Unit price'), _('Quantity'), _('Sum'))
             for p in products:
                 unit_price = intcomma(round(Decimal(p['unitPrice'] / 100), 2))
-                output += format_html('<tr><td>{}</td><td>{} PLN</td><td>{}</td></tr>', p['name'], unit_price, p['quantity'])
+                product_sum = intcomma(round(Decimal(p['unitPrice'] / 100), 2) * p['quantity'])
+                output += format_html('<tr><td>{}</td><td>{} PLN</td><td>{}</td><td>{} PLN</td></tr>', p['name'], unit_price, p['quantity'], product_sum)
             output += '</table>'
             return mark_safe(output)
         except (KeyError, ValueError):

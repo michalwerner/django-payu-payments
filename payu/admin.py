@@ -12,6 +12,9 @@ from .models import Payment
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        return False
+
     def get_status(self, obj):
         if obj.status == 'COMPLETED':
             color = '#009200'

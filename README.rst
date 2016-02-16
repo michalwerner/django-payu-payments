@@ -34,15 +34,12 @@ Installation
 Configuration
 =============
 
-``PAYU['test']``
-^^^^^^^^^^^^^^^^
+- ``PAYU['test']``
 
     Enables PayU test channel, ignoring ``post_id``,
     ``md5_key`` and ``second_md5_key``.
 
-
-``PAYU['continue_path']``
-^^^^^^^^^^^^^^^^^^^^^^^^^
+- ``PAYU['continue_path']``
 
     Specifies path on your website, where user should be redirected after payment (successful, or not).
     May be absolute path, like ``/some-page/`` or ``reverse('some:thing')``.

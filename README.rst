@@ -1,3 +1,7 @@
+.. image:: https://codeclimate.com/github/michalwerner/django-payu-payments/badges/gpa.svg
+   :target: https://codeclimate.com/github/michalwerner/django-payu-payments
+   :alt: Code Climate
+
 Installation
 ============
 

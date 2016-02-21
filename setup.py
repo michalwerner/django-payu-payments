@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-payu-payments',
-    version='0.1.1',
+    version='0.1.2',
     description='PayU integration for Django.',
     url='https://github.com/michalwerner/django-payu-payments',
     author='Michal Werner',

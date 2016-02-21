@@ -48,8 +48,8 @@ Configuration
     Specifies path on your website, where user should be redirected after payment (successful, or not).
     May be absolute path, like ``/some-page/`` or ``reverse('some:thing')``.
 
-Usage
-=====
+Create payment
+==============
 
 To create payment object you have to call ``Payment.create`` method: ::
 
@@ -83,3 +83,28 @@ To create payment object you have to call ``Payment.create`` method: ::
 ``notes`` are optional, all other arguments are required.
 
 ``Payment.create`` will return URL where buyer should be redirected, or ``False`` if not successful.
+
+Fetch payment's data
+====================
+
+To get data associated with payment you just need to retrieve ``Payment`` object: ::
+
+    Payment.objects.get(...)
+
+There are also few helpful methods, which you can call on ``Payment`` object:
+
+- ``get_total_display()``
+
+    Returns pretty formatted ``total`` value.
+
+- ``get_products_table()``
+
+    Returns pretty formatted table of products associated with payment.
+
+- ``is_successful()``
+
+    For ``status`` equal ``COMPLETED`` returns ``True``, otherwise ``False``.
+
+- ``is_not_successful()``
+
+    For ``status`` equal ``CANCELED`` or ``REJECTED`` returns ``True``, otherwise ``False``.

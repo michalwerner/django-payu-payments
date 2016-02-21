@@ -1,10 +1,6 @@
-import json
-from decimal import Decimal
-
 from django.contrib import admin
 from django.utils.translation import ugettext as _
-from django.utils.html import format_html, mark_safe
-from django.contrib.humanize.templatetags.humanize import intcomma
+from django.utils.html import format_html
 from django.conf import settings
 
 from .models import Payment
@@ -29,37 +25,17 @@ class PaymentAdmin(admin.ModelAdmin):
             return obj.get_status_display()
     get_status.short_description = _('Status')
 
-    def get_products(self, obj):
-        products = json.loads(obj.products)
-        try:
-            if not products:
-                return ''
-            output = format_html('<table><tr><td><strong>{}</strong></td><td><strong>{}</strong></td><td><strong>{}</strong></td><td><strong>{}</strong></td></tr>', _('Product'), _('Unit price'), _('Quantity'), _('Sum'))
-            for p in products:
-                unit_price = intcomma(round(Decimal(p['unitPrice'] / 100), 2))
-                product_sum = intcomma(round(Decimal(p['unitPrice'] / 100), 2) * p['quantity'])
-                output += format_html('<tr><td>{}</td><td>{} PLN</td><td>{}</td><td>{} PLN</td></tr>', p['name'], unit_price, p['quantity'], product_sum)
-            output += '</table>'
-            return mark_safe(output)
-        except (KeyError, ValueError):
-            return _('Invalid data.')
-    get_products.short_description = _('Products')
-
-    def get_total(self, obj):
-        return '{} PLN'.format(intcomma(round(Decimal(obj.total / 100), 2)))
-    get_total.short_description = _('Total')
-
     list_display = ('id', 'payu_order_id', 'pos_id', 'created',
-                    'get_status', 'get_total')
+                    'get_status', 'get_total_display')
     list_filter = ('status',)
     readonly_fields = ('id', 'payu_order_id', 'pos_id', 'customer_ip',
-                       'created', 'get_status', 'get_total', 'description', 'get_products')
+                       'created', 'get_status', 'get_total_display', 'description', 'get_products_table')
 
     fieldsets = [
         (None, {
             'fields': (('id', 'payu_order_id'), ('pos_id', 'customer_ip'),
-                       'created', 'description', 'get_status', 'get_products',
-                       'get_total', 'notes')
+                       'created', 'description', 'get_status', 'get_products_table',
+                       'get_total_display', 'notes')
         }),
     ]
 

@@ -1,6 +1,7 @@
 import uuid
 import json
 import requests
+from decimal import Decimal
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -9,6 +10,8 @@ from django.contrib.postgres.fields import JSONField
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.core.exceptions import ImproperlyConfigured
+from django.contrib.humanize.templatetags.humanize import intcomma
+from django.utils.html import format_html, mark_safe
 
 from ipware.ip import get_real_ip, get_ip
 
@@ -147,3 +150,29 @@ class Payment(models.Model):
         payment.save()
 
         return redirect_url
+
+    def get_total_display(self):
+        return '{} PLN'.format(intcomma(round(Decimal(self.total / 100), 2)))
+    get_total_display.short_description = _('Total')
+
+    def get_products_table(self):
+        products = json.loads(self.products)
+        try:
+            if not products:
+                return ''
+            output = format_html('<table><tr><td><strong>{}</strong></td><td><strong>{}</strong></td><td><strong>{}</strong></td><td><strong>{}</strong></td></tr>', _('Product'), _('Unit price'), _('Quantity'), _('Sum'))
+            for p in products:
+                unit_price = intcomma(round(Decimal(p['unitPrice'] / 100), 2))
+                product_sum = intcomma(round(Decimal(p['unitPrice'] / 100), 2) * p['quantity'])
+                output += format_html('<tr><td>{}</td><td>{} PLN</td><td>{}</td><td>{} PLN</td></tr>', p['name'], unit_price, p['quantity'], product_sum)
+            output += '</table>'
+            return mark_safe(output)
+        except (KeyError, ValueError):
+            return _('Invalid data.')
+    get_products_table.short_description = _('Products')
+
+    def is_successful(self):
+        return self.status == 'COMPLETED'
+
+    def is_not_successful(self):
+        return self.status in ('CANCELED', 'REJECTED')

@@ -6,13 +6,12 @@ from decimal import Decimal
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 from django.core.urlresolvers import reverse
-from django.utils.html import escape
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.html import escape, format_html, mark_safe
 from django.contrib.humanize.templatetags.humanize import intcomma
-from django.utils.html import format_html, mark_safe
 
+from jsonfield import JSONField
 from ipware.ip import get_real_ip, get_ip
 
 
@@ -156,7 +155,7 @@ class Payment(models.Model):
     get_total_display.short_description = _('Total')
 
     def get_products_table(self):
-        products = json.loads(self.products)
+        products = self.products
         try:
             if not products:
                 return ''

@@ -21,6 +21,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'django',
+        'jsonfield',
         'requests',
         'django-ipware'
     ],

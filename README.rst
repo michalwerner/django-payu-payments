@@ -125,6 +125,7 @@ Changelog
 - JSONField is not Postgres-only anymore
 - ``Payment.create()`` now returns two-key dictionary instead of just redirect URL
 - ``Payment`` objects are now ordered from newest to oldest, by default
+- compiled translation is now included in package
 
 JSONField and ordering related changes requires you to take some action when upgrading.
 

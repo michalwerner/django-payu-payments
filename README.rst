@@ -82,7 +82,12 @@ To create payment object you have to call ``Payment.create`` method: ::
 
 ``notes`` are optional, all other arguments are required.
 
-``Payment.create`` will return URL where buyer should be redirected, or ``False`` if not successful.
+``Payment.create`` will return two-key dictionary, containing ``Payment`` object and URL where buyer should be redirected, or ``False`` if not successful. ::
+
+    {
+        'object': <Payment object>,
+        'redirect_url': 'https://...'
+    }
 
 Fetch payment's data
 ====================
@@ -108,3 +113,38 @@ There are also few helpful methods, which you can call on ``Payment`` object:
 - ``is_not_successful()``
 
     For ``status`` equal ``CANCELED`` or ``REJECTED`` returns ``True``, otherwise ``False``.
+
+
+Changelog
+=========
+
+0.1.2
+-----
+- changelog added
+- ``get_total_display()``,  ``get_products_table()``, ``is_successful()`` and ``is_not_successful()`` methods added
+- JSONField is not Postgres-only anymore
+- ``Payment.create()`` now returns two-key dictionary instead of just redirect URL
+- ``Payment`` objects are now ordered from newest to oldest, by default
+
+JSONField and ordering related changes requires you to take some action when upgrading.
+
+1) run migrations: ``python manage.py migrate payu``.
+
+2) run following code, using Django shell (``python manage.py shell``): ::
+
+    import json
+    from payu.models import Payment
+
+
+    for p in Payment.objects.all():
+        if isinstance(p.products, str):
+             p.products = json.loads(p.products)
+             p.save()
+
+0.1.1
+-----
+- sum added to products table
+
+0.1.0
+-----
+- initial version

@@ -46,6 +46,7 @@ class Payment(models.Model):
 
     class Meta:
         app_label = 'payu'
+        ordering = ('-created',)
         verbose_name = _('payment')
         verbose_name_plural = _('payments')
 
@@ -148,7 +149,10 @@ class Payment(models.Model):
         payment.payu_order_id = payu_order_id
         payment.save()
 
-        return redirect_url
+        return {
+            'object': payment,
+            'redirect_url': redirect_url
+        }
 
     def get_total_display(self):
         return '{} PLN'.format(intcomma(round(Decimal(self.total / 100), 2)))

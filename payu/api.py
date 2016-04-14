@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.utils.html import escape
 
 from .models import Payment
+from . import settings as payu_settings
 
 
 @require_http_methods(['POST'])
@@ -26,7 +27,7 @@ def notify(request):
     except KeyError:
         return HttpResponse(status=400)
 
-    second_md5_key = Payment.get_payu_params()['second_md5_key'].encode('utf-8')
+    second_md5_key = payu_settings.PAYU_SECOND_MD5_KEY.encode('utf-8')
     expected_signature = hashlib.md5(request.body + second_md5_key).hexdigest()
     if incoming_signature != expected_signature:
         return HttpResponse(status=403)

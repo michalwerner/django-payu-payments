@@ -5,14 +5,14 @@ from decimal import Decimal
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.html import escape, format_html, mark_safe
 from django.contrib.humanize.templatetags.humanize import intcomma
 
 from jsonfield import JSONField
 from ipware.ip import get_real_ip, get_ip
+
+from . import settings as payu_settings
 
 
 ENDPOINT_URL = 'https://secure.payu.com/api/v2_1/orders'
@@ -53,35 +53,12 @@ class Payment(models.Model):
     def __str__(self):
         return str(self.id)
 
-    @staticmethod
-    def get_payu_params():
-        try:
-            payu_settings = settings.PAYU
-            if payu_settings['test']:
-                return {
-                    'pos_id': TEST_POS_ID,
-                    'md5_key': TEST_MD5_KEY,
-                    'second_md5_key': TEST_SECOND_MD5_KEY,
-                    'continue_path': payu_settings['continue_path']
-                }
-            else:
-                return {
-                    'pos_id': payu_settings['pos_id'],
-                    'md5_key': payu_settings['md5_key'],
-                    'second_md5_key': payu_settings['second_md5_key'],
-                    'continue_path': payu_settings['continue_path']
-                }
-        except (AttributeError, KeyError):
-            raise ImproperlyConfigured('PayU settings does not exist or not complete.')
-
     @classmethod
     def get_oauth_token(cls):
-        params = cls.get_payu_params()
-
         oauth_request_data = {
             'grant_type': 'client_credentials',
-            'client_id': params['pos_id'],
-            'client_secret': params['md5_key']
+            'client_id': payu_settings.PAYU_POS_ID,
+            'client_secret': payu_settings.PAYU_MD5_KEY
         }
         try:
             oauth_request = requests.post(OAUTH_URL, data=oauth_request_data)
@@ -91,9 +68,7 @@ class Payment(models.Model):
             return False
 
     @classmethod
-    def create(cls, request, description, products, buyer, notes=None):
-        params = cls.get_payu_params()
-
+    def create(cls, request, description, products, buyer, validity_time=payu_settings.PAYU_VALIDITY_TIME, notes=None):
         try:
             processed_products = [{
                 'name': p['name'],
@@ -110,7 +85,7 @@ class Payment(models.Model):
         customer_ip = get_real_ip(request) or get_ip(request)
 
         payment = cls(
-            pos_id=params['pos_id'],
+            pos_id=payu_settings.PAYU_POS_ID,
             customer_ip=customer_ip,
             total=total,
             description=description,
@@ -121,7 +96,7 @@ class Payment(models.Model):
         payment_request_data = {
             'extOrderId': str(payment.id),
             'customerIp': customer_ip,
-            'merchantPosId': params['pos_id'],
+            'merchantPosId': payu_settings.PAYU_POS_ID,
             'description': description,
             'currencyCode': 'PLN',
             'totalAmount': total,
@@ -129,7 +104,8 @@ class Payment(models.Model):
             'buyer': buyer,
             'settings': {'invoiceDisabled': True},
             'notifyUrl': request.build_absolute_uri(reverse('payu:api:notify')),
-            'continueUrl': request.build_absolute_uri(params['continue_path']),
+            'continueUrl': request.build_absolute_uri(payu_settings.PAYU_CONTINUE_PATH),
+            'validityTime': validity_time
         }
         payment_request_headers = {
             'Content-Type': 'application/json',

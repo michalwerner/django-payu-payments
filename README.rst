@@ -21,32 +21,37 @@ Installation
 
     url(r'^payments/', include('payu.urls', namespace='payu')),
 
-4. Add following settings to your settings module: ::
 
-    PAYU = {
-        'test': True,
-        'pos_id': 'YOUR POS ID',
-        'md5_key': 'YOUR MD5 KEY',
-        'second_md5_key': 'YOUR SECOND MD5 KEY',
-        'continue_path': '/some-page/'
-    }
-
-5. Run migrations: ::
+4. Run migrations: ::
 
     python manage.py migrate
 
 Configuration
 =============
 
-- ``PAYU['test']``
+Configuration is done via Django's ``settins.py`` file.
 
-    Enables PayU test channel, ignoring ``post_id``,
-    ``md5_key`` and ``second_md5_key``.
+- ``PAYU_POS_ID``
 
-- ``PAYU['continue_path']``
+    Your POS ID. If not provided the test payment value will be used.
+
+- ``PAYU_MD5_KEY``
+
+    Your MD5 key. If not provided the test payment value will be used.
+
+- ``PAYU_SECOND_MD5_KEY``
+
+    Your second MD5 key. If not provided the test payment value will be used.
+
+- ``PAYU_CONTINUE_PATH``
 
     Specifies path on your website, where user should be redirected after payment (successful, or not).
     May be absolute path, like ``/some-page/`` or ``reverse('some:thing')``.
+
+- ``PAYU_VALIDITY_TIME``
+
+    Payment validity time (in seconds), after which it's canceled, if user did not take action.
+    If not provided ``600`` will be used.
 
 Create payment
 ==============
@@ -76,11 +81,13 @@ To create payment object you have to call ``Payment.create`` method: ::
     }
     notes = 'This client is important for us, we should prioritize him.'
 
-    payment = Payment.create(request, description, products, buyer, notes)
+    payment = Payment.create(request, description, products, buyer, validity_time=300, notes)
 
 ``request`` is just Django HTTP request object, we need it to get buyer IP, and absolute URLs.
 
-``notes`` are optional, all other arguments are required.
+``validity_time`` is optional and overrides ``PAYU_VALIDITY_TIME`` setting.
+
+``notes`` is optional, and used for storing internal information about payment.
 
 ``Payment.create`` will return two-key dictionary, containing ``Payment`` object and URL where buyer should be redirected, or ``False`` if not successful. ::
 
@@ -126,6 +133,9 @@ Changelog
 - ``Payment.create()`` now returns two-key dictionary instead of just redirect URL
 - ``Payment`` objects are now ordered from newest to oldest, by default
 - compiled translation is now included in package
+- settings moved to ``settings.py``
+- settings is not dictionary anymore
+- validity time added
 
 JSONField and ordering related changes requires you to take some action when upgrading.
 

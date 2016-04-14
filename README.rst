@@ -1,6 +1,14 @@
 .. image:: https://codeclimate.com/github/michalwerner/django-payu-payments/badges/gpa.svg
    :target: https://codeclimate.com/github/michalwerner/django-payu-payments
-   :alt: Code Climate
+
+.. image:: https://img.shields.io/pypi/v/django-payu-payments.svg
+   :target: https://pypi.python.org/pypi/django-payu-payments
+
+.. image:: https://img.shields.io/pypi/dm/django-payu-payments.svg
+   :target: https://pypi.python.org/pypi/django-payu-payments
+
+.. image:: https://img.shields.io/pypi/l/django-payu-payments.svg
+   :target: https://pypi.python.org/pypi/django-payu-payments
 
 Installation
 ============

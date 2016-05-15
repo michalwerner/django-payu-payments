@@ -3,11 +3,11 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-payu-payments',
-    version='0.1.2',
+    version='0.1.3',
     description='PayU integration for Django.',
     url='https://github.com/michalwerner/django-payu-payments',
     author='Michal Werner',
-    author_email='werner@hurtowniapixeli.pl',
+    author_email='michal@hurtowniapixeli.pl',
     license='MIT',
     classifiers=[
         'Development Status :: 3 - Alpha',

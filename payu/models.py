@@ -37,8 +37,12 @@ class Payment(models.Model):
     payu_order_id = models.CharField(_('PayU order ID'), max_length=255)
     pos_id = models.CharField(_('PayU POS ID'), max_length=255)
     customer_ip = models.CharField(_('customer IP'), max_length=255)
-    created = models.DateTimeField(_('creation date'), auto_now_add=True, editable=True)
-    status = models.CharField(_('status'), max_length=255, choices=STATUS_CHOICES, default='NEW')
+    created = models.DateTimeField(
+        _('creation date'), auto_now_add=True, editable=True
+    )
+    status = models.CharField(
+        _('status'), max_length=255, choices=STATUS_CHOICES, default='NEW'
+    )
     total = models.PositiveIntegerField(_('total'))
     description = models.TextField(_('description'), null=True, blank=True)
     products = JSONField(_('products'), default='', blank=True)
@@ -68,7 +72,8 @@ class Payment(models.Model):
             return False
 
     @classmethod
-    def create(cls, request, description, products, buyer, validity_time=payu_settings.PAYU_VALIDITY_TIME, notes=None):
+    def create(cls, request, description, products, buyer,
+               validity_time=payu_settings.PAYU_VALIDITY_TIME, notes=None):
         try:
             processed_products = [{
                 'name': p['name'],
@@ -103,8 +108,12 @@ class Payment(models.Model):
             'products': processed_products,
             'buyer': buyer,
             'settings': {'invoiceDisabled': True},
-            'notifyUrl': request.build_absolute_uri(reverse('payu:api:notify')),
-            'continueUrl': request.build_absolute_uri(payu_settings.PAYU_CONTINUE_PATH),
+            'notifyUrl': request.build_absolute_uri(
+                reverse('payu:api:notify')
+            ),
+            'continueUrl': request.build_absolute_uri(
+                payu_settings.PAYU_CONTINUE_PATH
+            ),
             'validityTime': validity_time
         }
         payment_request_headers = {
@@ -139,11 +148,34 @@ class Payment(models.Model):
         try:
             if not products:
                 return ''
-            output = format_html('<table><tr><td><strong>{}</strong></td><td><strong>{}</strong></td><td><strong>{}</strong></td><td><strong>{}</strong></td></tr>', _('Product'), _('Unit price'), _('Quantity'), _('Sum'))
+            output = format_html(
+                '''
+                    <table>
+                        <tr>
+                            <td><strong>{}</strong></td>
+                            <td><strong>{}</strong></td>
+                            <td><strong>{}</strong></td>
+                            <td><strong>{}</strong></td>
+                        </tr>
+                ''',
+                _('Product'), _('Unit price'), _('Quantity'), _('Sum')
+            )
             for p in products:
                 unit_price = intcomma(round(Decimal(p['unitPrice'] / 100), 2))
-                product_sum = intcomma(round(Decimal(p['unitPrice'] / 100), 2) * p['quantity'])
-                output += format_html('<tr><td>{}</td><td>{} PLN</td><td>{}</td><td>{} PLN</td></tr>', p['name'], unit_price, p['quantity'], product_sum)
+                product_sum = intcomma(
+                    round(Decimal(p['unitPrice'] / 100), 2) * p['quantity']
+                )
+                output += format_html(
+                    '''
+                        <tr>
+                            <td>{}</td>
+                            <td>{} PLN</td>
+                            <td>{}</td>
+                            <td>{} PLN</td>
+                        </tr>
+                    ''',
+                    p['name'], unit_price, p['quantity'], product_sum
+                )
             output += '</table>'
             return mark_safe(output)
         except (KeyError, ValueError):

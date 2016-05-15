@@ -133,6 +133,10 @@ There are also few helpful methods, which you can call on ``Payment`` object:
 Changelog
 =========
 
+0.1.3
+-----
+- PEP8 fixes
+
 0.1.2
 -----
 - changelog added

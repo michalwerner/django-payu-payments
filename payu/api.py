@@ -40,12 +40,14 @@ def notify(request):
         return HttpResponse(status=400)
 
     try:
-        payment = Payment.objects.exclude(status='COMPLETED').get(id=internal_id, payu_order_id=payu_order_id)
+        payment = Payment.objects.exclude(status='COMPLETED') \
+                         .get(id=internal_id, payu_order_id=payu_order_id)
     except (Payment.DoesNotExist, ValueError):
         return HttpResponse(status=200)
 
     status = escape(data['order']['status'])
-    if status in ('PENDING', 'WAITING_FOR_CONFIRMATION', 'COMPLETED', 'CANCELED', 'REJECTED'):
+    if status in ('PENDING', 'WAITING_FOR_CONFIRMATION', 'COMPLETED',
+                  'CANCELED', 'REJECTED'):
         payment.status = status
         payment.save()
     return HttpResponse(status=200)

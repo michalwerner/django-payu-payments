@@ -20,7 +20,11 @@ class PaymentAdmin(admin.ModelAdmin):
             color = None
 
         if color:
-            return format_html('<span style="color: {}">{}</span>', color, obj.get_status_display())
+            return format_html(
+                '<span style="color: {}">{}</span>',
+                color,
+                obj.get_status_display()
+            )
         else:
             return obj.get_status_display()
     get_status.short_description = _('Status')
@@ -29,13 +33,14 @@ class PaymentAdmin(admin.ModelAdmin):
                     'get_status', 'get_total_display')
     list_filter = ('status',)
     readonly_fields = ('id', 'payu_order_id', 'pos_id', 'customer_ip',
-                       'created', 'get_status', 'get_total_display', 'description', 'get_products_table')
+                       'created', 'get_status', 'get_total_display',
+                       'description', 'get_products_table')
 
     fieldsets = [
         (None, {
             'fields': (('id', 'payu_order_id'), ('pos_id', 'customer_ip'),
-                       'created', 'description', 'get_status', 'get_products_table',
-                       'get_total_display', 'notes')
+                       'created', 'description', 'get_status',
+                       'get_products_table', 'get_total_display', 'notes')
         }),
     ]
 

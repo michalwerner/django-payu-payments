@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.utils.html import escape, format_html, mark_safe
+from django.utils.http import urlencode
 from django.contrib.humanize.templatetags.humanize import intcomma
 
 from jsonfield import JSONField
@@ -34,7 +35,9 @@ STATUS_CHOICES = (
 
 class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    payu_order_id = models.CharField(_('PayU order ID'), max_length=255)
+    payu_order_id = models.CharField(
+        _('PayU order ID'), max_length=255, null=True, blank=True
+    )
     pos_id = models.CharField(_('PayU POS ID'), max_length=255)
     customer_ip = models.CharField(_('customer IP'), max_length=255)
     created = models.DateTimeField(
@@ -97,47 +100,60 @@ class Payment(models.Model):
             products=json.dumps(processed_products),
             notes=notes
         )
+        # not saved yet!
 
-        payment_request_data = {
-            'extOrderId': str(payment.id),
-            'customerIp': customer_ip,
-            'merchantPosId': payu_settings.PAYU_POS_ID,
-            'description': description,
-            'currencyCode': 'PLN',
-            'totalAmount': total,
-            'products': processed_products,
-            'buyer': buyer,
-            'settings': {'invoiceDisabled': True},
-            'notifyUrl': request.build_absolute_uri(
-                reverse('payu:api:notify')
-            ),
-            'continueUrl': request.build_absolute_uri(
-                payu_settings.PAYU_CONTINUE_PATH
-            ),
-            'validityTime': validity_time
-        }
-        payment_request_headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer {}'.format(cls.get_oauth_token())
-        }
-        try:
-            payment_request = requests.post(ENDPOINT_URL,
-                                            json=payment_request_data,
-                                            headers=payment_request_headers,
-                                            allow_redirects=False)
-            response = payment_request.json()
-            payu_order_id = escape(response['orderId'])
-            redirect_url = response['redirectUri']
-        except:
-            return False
+        if total:
+            payment_request_data = {
+                'extOrderId': str(payment.id),
+                'customerIp': customer_ip,
+                'merchantPosId': payu_settings.PAYU_POS_ID,
+                'description': description,
+                'currencyCode': 'PLN',
+                'totalAmount': total,
+                'products': processed_products,
+                'buyer': buyer,
+                'settings': {'invoiceDisabled': True},
+                'notifyUrl': request.build_absolute_uri(
+                    reverse('payu:api:notify')
+                ),
+                'continueUrl': request.build_absolute_uri(
+                    payu_settings.PAYU_CONTINUE_PATH
+                ),
+                'validityTime': validity_time
+            }
+            payment_request_headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer {}'.format(cls.get_oauth_token())
+            }
+            try:
+                payment_request = requests.post(
+                    ENDPOINT_URL,
+                    json=payment_request_data,
+                    headers=payment_request_headers,
+                    allow_redirects=False
+                )
+                response = payment_request.json()
+                payu_order_id = escape(response['orderId'])
+                redirect_url = response['redirectUri']
 
-        payment.payu_order_id = payu_order_id
-        payment.save()
+                payment.payu_order_id = payu_order_id
+                payment.save()
 
-        return {
-            'object': payment,
-            'redirect_url': redirect_url
-        }
+                return {
+                    'object': payment,
+                    'redirect_url': redirect_url
+                }
+            except:
+                return False
+
+        else:  # total == 0
+            payment.status = 'COMPLETED'
+            payment.save()
+            return {
+                'object': payment,
+                'redirect_url': (payu_settings.PAYU_CONTINUE_PATH + '?' +
+                                 urlencode({'no_payment': 1}))
+            }
 
     def get_total_display(self):
         return '{} PLN'.format(intcomma(round(Decimal(self.total / 100), 2)))

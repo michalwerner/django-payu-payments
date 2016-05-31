@@ -55,6 +55,8 @@ Configuration is done via Django's ``settins.py`` file.
 
     Specifies path on your website, where user should be redirected after payment (successful, or not).
     May be absolute path, like ``/some-page/`` or ``reverse('some:thing')``.
+    This view should handle GET parameters ``error=501`` in case of failed payment and
+    ``no_payment=1`` in case of payment with total equals 0, which is registered, but actually sent to PayU.
 
 - ``PAYU_VALIDITY_TIME``
 
